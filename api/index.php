@@ -54,6 +54,37 @@ $app->get('/users/search/:query',function($query) use ($db){
 
 });
 
+$app->get("/users/csv",function() use ($db){
+
+	$sql = "SELECT user_id,firstname,lastname,job FROM snappers ORDER BY user_id";
+	try {
+		header('Content-Type: application/octet-stream');
+		header('Content-Disposition: attachment;filename=users.csv');
+		header('Cache-Control: no-cache, no-store, must-revalidate');
+		header('Pragma: no-cache');
+		header('Expires: 0');
+		$csvoutput = fopen('php://output', 'w');
+		$stmt = $db->query($sql);
+        $first_row = $stmt->fetch(PDO::FETCH_ASSOC);
+		$headers = array_keys($first_row);
+		fputcsv($csvoutput, $headers);
+		fputcsv($csvoutput, $first_row);
+		while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+			fputcsv($csvoutput, $row);
+		}
+		fclose($csvoutput);
+		exit;
+
+
+	} catch(PDOException $e) {
+
+		echo '{"error":{"text":'. $e->getMessage() .'}}';
+	}
+
+
+
+});
+
 $app->run();
 
 

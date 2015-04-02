@@ -8,3 +8,5 @@ Resources available:
 /users
 
 /users/search/{name}
+
+/users/csv (Needs improvement)
